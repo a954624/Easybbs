@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="header">
+        <div class="header" v-if="showHeader"> 
             <div class="header-content" 
             :style="{ width : proxy.globalInfo.bodyWidth + 'px' }">
                 <!-- logo -->
@@ -27,13 +27,19 @@
             </div>
         </div>
         <div>
-            <router-view />
+            <div :style=" {height: '200px', background : 'red' }">1</div>
+            <div :style=" {height: '200px', background : 'blue' }">2</div>
+            <div :style=" {height: '200px', background : 'red' }">3</div>
+            <div :style=" {height: '200px', background : 'blue' }">4</div>
+            <div :style=" {height: '200px', background : 'red' }">5</div>
+            <div :style=" {height: '200px', background : 'blue' }">6</div>
+            <!-- <router-view /> -->
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, reactive, getCurrentInstance } from 'vue';
+import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
 const { proxy } = getCurrentInstance();
@@ -70,6 +76,43 @@ const logoInfo = ref([
         color: "#FFBA02",
     }
 ])
+
+const showHeader = ref(true);
+
+const getScrollTop = () => {
+    let scrollTop = 
+        document.getElementById.scrollTop ||
+        window.pageYOffset ||
+        document.body.scrollTop;
+    return scrollTop;
+}
+
+const initScroll = () => {
+    let initScrollTop = getScrollTop();
+    let scrollType = 0;
+    window.addEventListener("scroll", () => {
+        let currentScrollTop = getScrollTop();
+        if (currentScrollTop > initScrollTop) {
+            // 往下滚动
+            scrollType = 1;
+        }
+        else {
+            // 往上滚动
+            scrollType = 0;
+        }
+        initScrollTop = currentScrollTop;
+        if (scrollType == 1 && currentScrollTop > 100) {
+            showHeader.value = false;
+        }
+        else {
+            showHeader.value = true;
+        }
+    })
+}
+
+onMounted(() => {
+    initScroll();
+})
 </script>
 
 <style lang="scss">
@@ -77,9 +120,12 @@ const logoInfo = ref([
     width: 100%;
     position: fixed;
     box-shadow: 0 2px 6px 0 #ddd;
+    z-index: 1000;
+    background: white;
     .header-content {
         margin :0px auto;
         align-items: center;
+        padding: 0px; 
         height: 60px;
         display: flex;
         align-items: center;
